@@ -1,0 +1,20 @@
+diff --git a/src/jackpal/androidterm/Term.java b/src/jackpal/androidterm/Term.java
+index 31109cc..10ce92f 100644
+--- a/src/jackpal/androidterm/Term.java
++++ b/src/jackpal/androidterm/Term.java
+@@ -309,6 +309,15 @@ public class Term extends Activity {
+ 
+         mEmulatorView.initialize(mTermFd, mTermOut);
+ 
++	String iInitialCommand = getIntent().getStringExtra("jackpal.androidterm.iInitialCommand");
++        if (iInitialCommand != null) {
++            if (mInitialCommand != null) {
++                mInitialCommand += "\r" + iInitialCommand;
++            } else {
++                mInitialCommand = iInitialCommand;
++            }
++        }
++
+         sendInitialCommand();
+     }
+ 

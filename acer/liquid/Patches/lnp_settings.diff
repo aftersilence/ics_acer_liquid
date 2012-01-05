@@ -1,0 +1,38 @@
+--- a/packages/apps/Settings/res/xml/settings.xml	2011-06-30 08:50:26.508850504 +0200
++++ b/packages/apps/Settings/res/xml/settings.xmlsettings_ori.xml	2011-06-29 00:56:35.000000000 +0200
+@@ -39,6 +39,16 @@
+                 android:targetClass="com.android.phone.CallFeaturesSetting" />
+         </com.android.settings.IconPreferenceScreen>
+ 
++ 	<!-- LN Settings -->
++	<com.android.settings.IconPreferenceScreen
++            settings:icon="@drawable/ic_lnp"
++            android:title="LiquidNext settings">
++            <intent
++                android:action="android.intent.action.MAIN"
++                android:targetPackage="com.suxsem.liquidnextparts"
++                android:targetClass="com.suxsem.liquidnextparts.activities.settings" />
++        </com.android.settings.IconPreferenceScreen>
++
+ 	<!-- CM Settings -->
+         <com.android.settings.IconPreferenceScreen
+             settings:icon="@drawable/ic_cyanogenmod"
+diff --git a/packages/apps/AndroidTerm/src/jackpal/androidterm/Term.java b/packages/apps/AndroidTerm/src/jackpal/androidterm/Term.java
+index 31109cc..10ce92f 100644
+--- a/packages/apps/AndroidTerm/src/jackpal/androidterm/Term.java
++++ b/packages/apps/AndroidTerm/src/jackpal/androidterm/Term.java
+@@ -309,6 +309,15 @@ public class Term extends Activity {
+ 
+         mEmulatorView.initialize(mTermFd, mTermOut);
+ 
++	String iInitialCommand = getIntent().getStringExtra("jackpal.androidterm.iInitialCommand");
++        if (iInitialCommand != null) {
++            if (mInitialCommand != null) {
++                mInitialCommand += "\r" + iInitialCommand;
++            } else {
++                mInitialCommand = iInitialCommand;
++            }
++        }
++
+         sendInitialCommand();
+     }

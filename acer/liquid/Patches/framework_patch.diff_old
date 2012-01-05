@@ -1,0 +1,60 @@
+diff --git a/frameworks/base/cmds/servicemanager/service_manager.c b/frameworks/base/cmds/servicemanager/service_manager.c
+index 57108c2..03e2f58 100644
+--- a/frameworks/base/cmds/servicemanager/service_manager.c
++++ b/frameworks/base/cmds/servicemanager/service_manager.c
+@@ -30,6 +30,7 @@ static struct {
+ #ifdef LVMX
+     { AID_MEDIA, "com.lifevibes.mx.ipc" },
+ #endif
++    { AID_COMPASS, "yamaha.hardware.sensors" },
+     { AID_MEDIA, "media.audio_flinger" },
+     { AID_MEDIA, "media.player" },
+     { AID_MEDIA, "media.camera" },
+diff --git a/frameworks/base/services/java/com/android/server/PowerManagerService.java b/frameworks/base/services/java/com/android/server/PowerManagerService.java
+index 85b6cfe..a929b26 100644
+--- a/frameworks/base/services/java/com/android/server/PowerManagerService.java
++++ b/frameworks/base/services/java/com/android/server/PowerManagerService.java
+@@ -111,7 +111,7 @@ class PowerManagerService extends IPowerManager.Stub
+     private static final int LIGHT_SENSOR_DELAY = 2000;
+ 
+     // For debouncing the proximity sensor.
+-    private static final int PROXIMITY_SENSOR_DELAY = 1000;
++    private static final int PROXIMITY_SENSOR_DELAY = 200;
+ 
+     // trigger proximity if distance is less than 5 cm
+     private static final float PROXIMITY_THRESHOLD = 5.0f;
+@@ -3423,6 +3424,7 @@ class PowerManagerService extends IPowerManager.Stub
+                         mLightSensorPendingValue = value;
+                         mHandler.postDelayed(mAutoBrightnessTask, LIGHT_SENSOR_DELAY);
+                     }
++               lightSensorChangedLocked(value);
+                 } else {
+                     mLightSensorPendingValue = -1;
+                 }
+diff --git a/frameworks/base/services/java/com/android/server/am/ActivityManagerService.java b/frameworks/base/services/java/com/android/server/am/ActivityManagerService.java
+index 6f37c56..c8bf767 100755
+--- a/frameworks/base/services/java/com/android/server/am/ActivityManagerService.java
++++ b/frameworks/base/services/java/com/android/server/am/ActivityManagerService.java
+@@ -11592,6 +11592,10 @@ public final class ActivityManagerService extends ActivityManagerNative
+             adj = FOREGROUND_APP_ADJ;
+             schedGroup = Process.THREAD_GROUP_DEFAULT;
+             app.adjType = "mms";
++	} else if ("com.suxsem.liquidnextparts".equals(app.processName)) {
++	    adj = FOREGROUND_APP_ADJ;
++            schedGroup = Process.THREAD_GROUP_DEFAULT;
++            app.adjType = "LNP";
+         } else if (app == TOP_APP) {
+             // The last app on the list is the foreground app.
+             adj = FOREGROUND_APP_ADJ;
+diff --git a/frameworks/base/telephony/java/com/android/internal/telephony/gsm/GsmDataConnectionTracker.java b/frameworks/base/telephony/java/com/android/internal/telephony/gsm/GsmDataConnectionTracker.java
+index bf72c38..5e7ddb2 100644
+--- a/frameworks/base/telephony/java/com/android/internal/telephony/gsm/GsmDataConnectionTracker.java
++++ b/frameworks/base/telephony/java/com/android/internal/telephony/gsm/GsmDataConnectionTracker.java
+@@ -1241,6 +1241,7 @@ public final class GsmDataConnectionTracker extends DataConnectionTracker {
+         if (state == State.CONNECTED) {
+             if (!mGsmPhone.mSST.isConcurrentVoiceAndData()) {
+                 startNetStatPoll();
++                cleanUpConnection(true, Phone.REASON_VOICE_CALL_ENDED);
+                 phone.notifyDataConnection(Phone.REASON_VOICE_CALL_ENDED);
+             } else {
+                 // clean slate after call end.

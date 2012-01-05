@@ -1,0 +1,75 @@
+diff --git a/vendor/cyanogen/products/AndroidProducts.mk b/vendor/cyanogen/products/AndroidProducts.mk
+index ed7f0cf..1bbd185 100644
+--- a/vendor/cyanogen/products/AndroidProducts.mk
++++ b/vendor/cyanogen/products/AndroidProducts.mk
+ add_lunch_combo cyanogen_ace-eng
+-add_lunch_combo cyanogen_anzu-eng
+ add_lunch_combo cyanogen_blade-eng
+ add_lunch_combo cyanogen_bravo-eng
+ add_lunch_combo cyanogen_bravoc-eng
+@@ -52,4 +51,4 @@ add_lunch_combo cyanogen_z71-eng
+ add_lunch_combo cyanogen_zeppelin-eng
+ add_lunch_combo cyanogen_zero-eng
+ add_lunch_combo cyanogen_zeus-eng
+-
++add_lunch_combo cyanogen_liquid-eng
+
+diff --git a/vendor/cyanogen/products/cyanogen_liquid.mk b/vendor/cyanogen/products/cyanogen_liquid.mk
+index e69de29..60f6f63 100644
+--- a/vendor/cyanogen/products/cyanogen_liquid.mk
++++ b/vendor/cyanogen/products/cyanogen_liquid.mk
+@@ -0,0 +1,44 @@
++# Inherit AOSP device configuration for liquid.
++$(call inherit-product, device/acer/liquid/liquid.mk)
++
++# Inherit some common cyanogenmod stuff.
++$(call inherit-product, vendor/cyanogen/products/common_full.mk)
++
++# Include GSM stuff (not needed as custom Acer apns-list and Stk are used)
++$(call inherit-product, vendor/cyanogen/products/gsm.mk)
++
++#
++# Setup device specific product configuration.
++#
++
++TARGET_NO_KERNEL := true
++PRODUCT_NAME := cyanogen_liquid  
++PRODUCT_BRAND := acer
++PRODUCT_DEVICE := liquid
++PRODUCT_BUILD_PROP_OVERRIDES += PRODUCT_NAME=liquid BUILD_ID=GRJ22 BUILD_DISPLAY_ID=GRJ90 BUILD_FINGERPRINT=google/passion/passion:2.3.4/GRJ22/121341:user/release-keys PRIVATE_BUILD_DESC="passion-user 2.3.4 GRJ22 121341 release-keys"
++
++# Extra Liquid overlay
++#PRODUCT_PACKAGE_OVERLAYS += vendor/cyanogen/overlay/liquid
++
++# CYANOGEN_WITH_GOOGLE := true
++
++# Use a precompiled kernel until the merge with cm-kernel
++# TARGET_PREBUILT_KERNEL = device/acer/liquid/kernel/prebuilt-zImage
++
++# Set ro.modversion
++ifdef CYANOGEN_NIGHTLY
++    PRODUCT_PROPERTY_OVERRIDES += \
++        ro.modversion=CyanogenMod-7-$(shell date +%m%d%Y)-NIGHTLY-Liquid
++else
++    ifdef CYANOGEN_RELEASE
++        PRODUCT_PROPERTY_OVERRIDES += \
++            ro.modversion=CyanogenMod-7.1.0-RC1-Liquid
++    else
++        PRODUCT_PROPERTY_OVERRIDES += \
++            ro.modversion=CyanogenMod-7.1.0-RC1-Liquid-KANG
++    endif
++endif
++
++# Copy HDPI prebuilt files
++PRODUCT_COPY_FILES +=  \
++    vendor/cyanogen/prebuilt/hdpi/media/bootanimation.zip:system/media/bootanimation.zip
+diff --git a/vendor/cyanogen/vendorsetup.sh b/vendor/cyanogen/vendorsetup.sh
+index d9df7ea..b9005cd 100644
+--- a/vendor/cyanogen/vendorsetup.sh
++++ b/vendor/cyanogen/vendorsetup.sh
+@@ -47,4 +47,5 @@ add_lunch_combo cyanogen_vivow-eng
+ add_lunch_combo cyanogen_z71-eng
+ add_lunch_combo cyanogen_zeppelin-eng
+ add_lunch_combo cyanogen_zero-eng
++add_lunch_combo cyanogen_liquid-eng
+ 

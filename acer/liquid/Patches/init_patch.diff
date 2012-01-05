@@ -1,0 +1,58 @@
+diff --git a/system/core/init/init.c b/system/core/init/init.c
+index 8c42b58..5a56a32 100755
+--- a/system/core/init/init.c
++++ b/system/core/init/init.c
+@@ -66,6 +66,7 @@ static char carrier[32];
+ static char bootloader[32];
+ static char hardware[32];
+ static unsigned revision = 0;
++static unsigned hw_version = 0;
+ static char qemu[32];
+ 
+ static struct action *cur_action = NULL;
+@@ -419,7 +420,8 @@ static void import_kernel_nv(char *name, int in_qemu)
+             strlcpy(bootloader, value, sizeof(bootloader));
+         } else if (!strcmp(name,"androidboot.hardware")) {
+             strlcpy(hardware, value, sizeof(hardware));
+-        }
++        } else if (!strcmp(name,"hw_ver")) {
++		hw_version = strtoul(value, 0, 2); }
+     } else {
+         /* in the emulator, export any kernel option with the
+          * ro.kernel. prefix */
+@@ -599,6 +601,8 @@ static int set_init_properties_action(int nargs, char **args)
+     property_set("ro.hardware", hardware);
+     snprintf(tmp, PROP_VALUE_MAX, "%d", revision);
+     property_set("ro.revision", tmp);
++    snprintf(tmp, PROP_VALUE_MAX, "%d", hw_version);
++    property_set("ro.hw_version", tmp);
+     return 0;
+ }
+ 
+diff --git a/system/core/init/property_service.c b/system/core/init/property_service.c
+index 24867cf..9eb8074 100644
+--- a/system/core/init/property_service.c
++++ b/system/core/init/property_service.c
+@@ -59,11 +59,13 @@ struct {
+     unsigned int gid;
+ } property_perms[] = {
+     { "net.rmnet",        AID_RADIO,    0 },
++    { "net.rmnet1.",      AID_RADIO,    0 },
+     { "net.gprs.",        AID_RADIO,    0 },
+     { "net.ppp",          AID_RADIO,    0 },
+     { "ril.",             AID_RADIO,    0 },
+     { "gsm.",             AID_RADIO,    0 },
+     { "persist.radio",    AID_RADIO,    0 },
++    { "persist.rild",     AID_RADIO,    0 },
+     { "net.dns",          AID_RADIO,    0 },
+     { "net.gannet",       AID_RADIO,    0 },
+     { "net.",             AID_SYSTEM,   0 },
+@@ -83,6 +85,8 @@ struct {
+     { "persist.sys.",     AID_SYSTEM,   0 },
+     { "persist.service.", AID_SYSTEM,   0 },
+     { "persist.security.",AID_SYSTEM,   0 },
++    { "persist.cust.",     AID_RADIO,  0 },
++    { "hw.acer",           AID_SYSTEM, 0 },
+     { "wimax.",           AID_SYSTEM,   1000 },
+     { "net.pdp0",         AID_RADIO,    0 },
+     { "net.pdp1",         AID_RADIO,    AID_RADIO },
